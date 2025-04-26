@@ -36,7 +36,7 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
  */
 export const createUser = async (userData: RegisterUser): Promise<User> => {
   logger.info('Starting createUser service', { email: userData.email });
-  
+
   return db.transaction(async (client) => {
     try {
       // Check if user already exists
@@ -65,16 +65,19 @@ export const createUser = async (userData: RegisterUser): Promise<User> => {
         [userData.email, hashedPassword, userData.firstName, userData.lastName],
       );
 
-      logger.info('User created successfully', { userId: result.rows[0].id, email: userData.email });
+      logger.info('User created successfully', {
+        userId: result.rows[0].id,
+        email: userData.email,
+      });
       return result.rows[0];
     } catch (error) {
       if (error instanceof AppError) {
         throw error;
       }
-      logger.error('Error creating user', { 
-        error: (error as Error).message, 
+      logger.error('Error creating user', {
+        error: (error as Error).message,
         email: userData.email,
-        stack: (error as Error).stack
+        stack: (error as Error).stack,
       });
       throw new AppError(`Error creating user: ${(error as Error).message}`, 500);
     }

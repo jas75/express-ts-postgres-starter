@@ -78,10 +78,9 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
   try {
     logger.info('Starting user registration process', { email: req.body.email });
-    
+
     const userData = req.body as RegisterUser;
-  
-    
+
     const newUser = await createUser(userData);
 
     // Remove password from response
@@ -92,7 +91,7 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
     logger.error('Registration failed', {
       email: req.body.email,
       error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     });
     throw error; // Re-throw to let asyncHandler and error middleware handle it
   }
