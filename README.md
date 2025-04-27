@@ -1,6 +1,11 @@
 # Express TypeScript PostgreSQL API
 
-A robust API built with Express.js, TypeScript and PostgreSQL, following best architectural practices.
+[![TypeScript](https://img.shields.io/badge/TypeScript-v5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-v20.0+-green.svg)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v15.0+-blue.svg)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+A robust and secure API built with Express.js, TypeScript and PostgreSQL, following best architectural practices.
 
 ## Features
 
@@ -19,12 +24,16 @@ A robust API built with Express.js, TypeScript and PostgreSQL, following best ar
 - **Logging**: Advanced logging with Winston
 - **Error Handling**: Centralized error management and logging system
 - **Transactional Management**: SQL transaction support
-- **Environment Variables**: Complete configuration management
+- **Environment Variables**: Complete configuration management with validation
+- **Security**: CORS protection, Helmet security headers, and SQL injection prevention
+- **API Versioning**: Support for multiple API versions
+- **Performance Monitoring**: Basic metrics and monitoring setup
+- **CI/CD Ready**: GitHub Actions workflow templates included
 
 ## Prerequisites
 
-- Node.js (v18+)
-- PostgreSQL
+- Node.js (v20+)
+- PostgreSQL (v15+)
 - Docker (optional)
 
 ## Quick Start
@@ -73,38 +82,75 @@ cd express-ts-postgres-api
 docker-compose up
 ```
 
+
+## Security Best Practices
+
+- All passwords are hashed using bcrypt
+- JWT tokens with short expiration time
+- Rate limiting to prevent brute force attacks
+- CORS configuration for allowed origins
+- Helmet security headers enabled
+- SQL injection prevention with parameterized queries
+- Input validation with Zod
+- Security headers configuration
+
 ## Project Structure
 
 ```
 .
 ├── migrations/               # Database migrations
 ├── src/
-│   ├── api/                  # API Layer
-│   │   └── v1/               # API Version 1
-│   │       ├── controllers/  # Request handlers
-│   │       ├── routes/       # API endpoint definitions
-│   │       └── services/     # Business logic for API v1
-│   ├── config/               # Application configuration
-│   ├── core/                 # Core Layer
-│   │   ├── database/         # Database management
-│   │   ├── middleware/       # Fundamental middleware
-│   │   ├── models/           # Data models
-│   │   └── types/            # Common types
-│   ├── utils/                # Utilities and helpers
-│   ├── __tests__/            # Tests
-│   └── index.ts              # Application entry point
-├── .env                      # Environment variables
-├── .env.example              # Environment variables example
-├── .eslintrc.json            # ESLint configuration
-├── .prettierrc               # Prettier configuration
-├── docker-compose.yml        # Docker Compose configuration
-├── Dockerfile                # Docker configuration
-├── jest.config.js            # Jest configuration
-├── migrate-config.js         # Database migration configuration
-├── nodemon.json              # Nodemon configuration
-├── package.json              # Project dependencies
-└── tsconfig.json             # TypeScript configuration
+│   ├── api/                 # API Layer
+│   │   └── v1/             # API Version 1
+│   │       ├── controllers/ # Request handlers
+│   │       ├── routes/     # API endpoint definitions
+│   │       └── services/   # Business logic for API v1
+│   ├── config/             # Application configuration
+│   ├── core/               # Core Layer
+│   │   ├── database/       # Database management
+│   │   ├── middleware/     # Fundamental middleware
+│   │   ├── models/        # Data models
+│   │   └── types/         # Common types
+│   ├── utils/             # Utilities and helpers
+│   └── index.ts           # Application entry point
+├── __tests__/             # Test files
+├── .env.example           # Environment variables example
+├── .env.test             # Test environment variables
+├── .eslintrc.json        # ESLint configuration
+├── .prettierrc           # Prettier configuration
+├── docker-compose.yml    # Docker Compose configuration
+├── Dockerfile            # Docker configuration
+├── jest.config.js        # Jest configuration
+├── migrate-config.js     # Database migration configuration
+├── nodemon.json          # Nodemon configuration
+├── package.json          # Project dependencies
+└── tsconfig.json         # TypeScript configuration
 ```
+
+### Key Components
+
+- **API Layer** (`src/api/`): Contains versioned API endpoints, controllers, and services
+- **Core Layer** (`src/core/`): Houses fundamental functionality like database access, middleware, and models
+- **Config** (`src/config/`): Application-wide configuration management
+- **Utils** (`src/utils/`): Shared utilities and helper functions
+- **Tests** (`__tests__/`): Test suites and test utilities
+- **Migrations** (`migrations/`): Database schema version control
+
+### Development Tools
+
+- TypeScript configuration via `tsconfig.json`
+- ESLint and Prettier for code quality
+- Jest for testing
+- Nodemon for development server
+- Docker support for containerization
+- Database migrations with `node-pg-migrate`
+
+This layered architecture promotes:
+- Clear separation of concerns
+- Version control of API endpoints
+- Centralized configuration management
+- Modular and maintainable codebase
+- Easy testing and deployment
 
 ## API Documentation
 
@@ -137,9 +183,21 @@ The project is organized in distinct layers:
 
 This layered architecture allows better separation of concerns and easier maintenance.
 
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Support
+
+For support, please open an issue in the GitHub repository.
+
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Database Migrations
 

@@ -1,8 +1,5 @@
 import { db } from '../../../src/core/database/postgresql';
 
-// Ce test utilise la base de données réelle configurée dans .env.test
-// Ce type de test doit être exécuté dans un environnement de test isolé
-
 describe('Database Integration Tests', () => {
   // Données de test
   const testUser = {
