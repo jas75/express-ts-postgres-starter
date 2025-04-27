@@ -11,7 +11,7 @@
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"{src,test,scripts}/**/*.{ts,js}\" \"*.{ts,js}\"",
-    "test": "jest",
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "test:unit": "jest --config __tests__/jest.unit.config.js",
     "test:integration": "jest --config __tests__/jest.integration.config.js",
     "test:e2e": "jest --config __tests__/jest.e2e.config.js",
