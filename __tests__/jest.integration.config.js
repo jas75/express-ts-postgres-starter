@@ -6,5 +6,5 @@ module.exports = {
   testMatch: ['**/__tests__/integration/**/*.test.ts'],
   setupFilesAfterEnv: undefined,
   maxWorkers: 1,
-  testTimeout: 30000
-}; 
+  testTimeout: 30000,
+};

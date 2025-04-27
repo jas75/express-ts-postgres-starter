@@ -46,4 +46,4 @@ describe('Authentication API', () => {
       expect(response.body.data.user).toHaveProperty('email', 'test@example.com');
     });
   });
-}); 
+});

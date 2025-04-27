@@ -1,67 +1,67 @@
-# Organisation des Tests
+# Test Organization
 
-Ce dossier contient tous les tests du projet, organisés selon leur type.
+This folder contains all project tests, organized by type.
 
-## Structure des dossiers
+## Folder Structure
 
 ```
 __tests__/
-  unit/                  # Tests unitaires isolés
-    services/            # Tests des services métier
-    utils/               # Tests des fonctions utilitaires
-  integration/           # Tests d'intégration
-    api/                 # Tests d'API
-    database/            # Tests d'intégration avec la BD
-  e2e/                   # Tests end-to-end
-  setup.ts               # Configuration commune des tests
-  jest.unit.config.js    # Configuration Jest pour tests unitaires
-  jest.integration.config.js # Configuration Jest pour tests d'intégration
-  jest.e2e.config.js     # Configuration Jest pour tests e2e
+  unit/                  # Isolated unit tests
+    services/            # Business service tests
+    utils/              # Utility function tests
+  integration/           # Integration tests
+    api/                # API tests
+    database/           # Database integration tests
+  e2e/                  # End-to-end tests
+  setup.ts              # Common test configuration
+  jest.unit.config.js   # Jest configuration for unit tests
+  jest.integration.config.js # Jest configuration for integration tests
+  jest.e2e.config.js    # Jest configuration for e2e tests
 ```
 
-## Types de tests
+## Test Types
 
-### Tests unitaires
+### Unit Tests
 
-Les tests unitaires testent des fonctions isolées. Ils sont rapides et n'utilisent pas de dépendances externes.
+Unit tests verify isolated functions. They are fast and don't use external dependencies.
 
 ```bash
 npm run test:unit
 ```
 
-### Tests d'intégration
+### Integration Tests
 
-Les tests d'intégration vérifient que différentes parties du système fonctionnent ensemble.
+Integration tests verify that different parts of the system work together.
 
 ```bash
 npm run test:integration
 ```
 
-### Tests End-to-End (E2E)
+### End-to-End (E2E) Tests
 
-Les tests E2E vérifient les flux complets d'utilisateur.
+E2E tests verify complete user flows.
 
 ```bash
 npm run test:e2e
 ```
 
-## Organisation recommandée
+## Recommended Organization
 
-Pour une bonne organisation, suivez ces principes:
+For good organization, follow these principles:
 
-1. **Mirroir de la structure source**:
-   - Chaque fichier de test doit refléter la structure du code source
-   - Exemple: Pour tester `src/utils/validators.ts`, créez `__tests__/unit/utils/validators.test.ts`
+1. **Mirror Source Structure**:
+   - Each test file should reflect the source code structure
+   - Example: To test `src/utils/validators.ts`, create `__tests__/unit/utils/validators.test.ts`
 
-2. **Nommage des fichiers**:
-   - Chaque fichier de test doit se terminer par `.test.ts`
-   - Utilisez le même nom que le fichier source pour faciliter la navigation
+2. **File Naming**:
+   - Each test file should end with `.test.ts`
+   - Use the same name as the source file for easy navigation
 
-3. **Pattern AAA**:
-   - **Arrange**: Préparation des données et de l'environnement
-   - **Act**: Exécution de l'action à tester
-   - **Assert**: Vérification des résultats
+3. **AAA Pattern**:
+   - **Arrange**: Prepare data and environment
+   - **Act**: Execute the action being tested
+   - **Assert**: Verify the results
 
-4. **Mocking efficace**:
-   - Utilisez `jest.mock()` pour les modules complets
-   - Utilisez `jest.fn()` et `jest.spyOn()` pour les fonctions spécifiques 
+4. **Effective Mocking**:
+   - Use `jest.mock()` for complete modules
+   - Use `jest.fn()` and `jest.spyOn()` for specific functions 

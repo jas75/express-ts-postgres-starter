@@ -6,7 +6,7 @@ import {
   generateRefreshToken,
   login,
   refreshToken,
-  revokeRefreshToken
+  revokeRefreshToken,
 } from '../../../../../src/api/v1/services/authService';
 import { AppError } from '../../../../../src/core/middleware/errorHandler';
 
@@ -22,19 +22,19 @@ jest.mock('jsonwebtoken');
 
 // Mock uuid
 jest.mock('uuid', () => ({
-  v4: jest.fn().mockReturnValue('fake-uuid')
+  v4: jest.fn().mockReturnValue('fake-uuid'),
 }));
 
 // Mock database
 jest.mock('../../../../../src/core/database/postgresql', () => ({
   db: {
-    query: jest.fn()
-  }
+    query: jest.fn(),
+  },
 }));
 
 // Mock bcrypt to always return true for compare
 jest.mock('bcrypt', () => ({
-  compare: jest.fn().mockResolvedValue(true)
+  compare: jest.fn().mockResolvedValue(true),
 }));
 
 // Mock logger
@@ -43,13 +43,13 @@ jest.mock('../../../../../src/utils/logger', () => ({
     info: jest.fn(),
     error: jest.fn(),
     warn: jest.fn(),
-    debug: jest.fn()
-  }
+    debug: jest.fn(),
+  },
 }));
 
 // Mock user service
 jest.mock('../../../../../src/api/v1/services/userService', () => ({
-  getUserByEmail: jest.fn()
+  getUserByEmail: jest.fn(),
 }));
 
 // Import mocked modules
@@ -65,9 +65,9 @@ describe('Auth Service', () => {
   describe('generateAccessToken', () => {
     it('should generate a JWT token', () => {
       const payload = { id: MOCK_UUID, email: 'test@example.com', role: 'user' };
-      
+
       const token = generateAccessToken(payload);
-      
+
       expect(token).toBe('fake-jwt-token');
       expect(jwt.sign).toHaveBeenCalledWith(payload, expect.any(String));
     });
@@ -77,9 +77,9 @@ describe('Auth Service', () => {
     it('should generate a refresh token and store it in the database', async () => {
       const userId = MOCK_UUID;
       (db.query as jest.Mock).mockResolvedValueOnce({});
-      
+
       const token = await generateRefreshToken(userId);
-      
+
       expect(token).toBe('fake-uuid');
       expect(db.query).toHaveBeenCalled();
       expect((db.query as jest.Mock).mock.calls[0][0]).toContain('INSERT INTO refresh_tokens');
@@ -89,7 +89,7 @@ describe('Auth Service', () => {
     it('should throw an AppError when database insertion fails', async () => {
       const userId = MOCK_UUID;
       (db.query as jest.Mock).mockRejectedValueOnce(new Error('Database error'));
-      
+
       await expect(generateRefreshToken(userId)).rejects.toThrow(AppError);
     });
   });
@@ -97,24 +97,24 @@ describe('Auth Service', () => {
   describe('login', () => {
     const credentials = {
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
     };
-    
+
     const mockUser = {
       id: MOCK_UUID,
       email: 'test@example.com',
       password: 'hashed_password',
       role: 'user',
-      is_active: true
+      is_active: true,
     };
 
     it('should successfully login and return tokens', async () => {
       (getUserByEmail as jest.Mock).mockResolvedValueOnce(mockUser);
       (compare as jest.Mock).mockResolvedValueOnce(true);
       (db.query as jest.Mock).mockResolvedValueOnce({}); // update last login
-      
+
       const result = await login(credentials);
-      
+
       expect(result).toHaveProperty('token', 'fake-jwt-token');
       expect(result).toHaveProperty('refreshToken', 'fake-uuid');
       expect(result.user).not.toHaveProperty('password');
@@ -122,23 +122,23 @@ describe('Auth Service', () => {
 
     it('should throw an AppError when user is not found', async () => {
       (getUserByEmail as jest.Mock).mockResolvedValueOnce(null);
-      
+
       await expect(login(credentials)).rejects.toThrow('Invalid email or password');
     });
 
     it('should throw an AppError when account is inactive', async () => {
       (getUserByEmail as jest.Mock).mockResolvedValueOnce({
         ...mockUser,
-        is_active: false
+        is_active: false,
       });
-      
+
       await expect(login(credentials)).rejects.toThrow('Account is inactive');
     });
 
     it('should throw an AppError when password is invalid', async () => {
       (getUserByEmail as jest.Mock).mockResolvedValueOnce(mockUser);
       (compare as jest.Mock).mockResolvedValueOnce(false);
-      
+
       await expect(login(credentials)).rejects.toThrow('Invalid email or password');
     });
   });
@@ -148,24 +148,24 @@ describe('Auth Service', () => {
     const mockTokenData = {
       id: MOCK_UUID,
       email: 'test@example.com',
-      role: 'user'
+      role: 'user',
     };
 
     it('should refresh token and return new tokens', async () => {
       (db.query as jest.Mock).mockResolvedValueOnce({
-        rows: [mockTokenData]
+        rows: [mockTokenData],
       });
       (db.query as jest.Mock).mockResolvedValueOnce({}); // Revoke old token
-      
+
       const result = await refreshToken(mockTokenId);
-      
+
       expect(result).toHaveProperty('token', 'fake-jwt-token');
       expect(result).toHaveProperty('refreshToken', 'fake-uuid');
     });
 
     it('should throw an AppError when token is invalid or expired', async () => {
       (db.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
-      
+
       await expect(refreshToken(mockTokenId)).rejects.toThrow('Invalid or expired refresh token');
     });
   });
@@ -174,18 +174,20 @@ describe('Auth Service', () => {
     it('should revoke a refresh token', async () => {
       const tokenId = 'token-id';
       (db.query as jest.Mock).mockResolvedValueOnce({});
-      
+
       await expect(revokeRefreshToken(tokenId)).resolves.not.toThrow();
-      
+
       expect(db.query).toHaveBeenCalled();
-      expect((db.query as jest.Mock).mock.calls[0][0]).toContain('UPDATE refresh_tokens SET revoked = true');
+      expect((db.query as jest.Mock).mock.calls[0][0]).toContain(
+        'UPDATE refresh_tokens SET revoked = true',
+      );
     });
 
     it('should throw an AppError when database update fails', async () => {
       const tokenId = 'token-id';
       (db.query as jest.Mock).mockRejectedValueOnce(new Error('Database error'));
-      
+
       await expect(revokeRefreshToken(tokenId)).rejects.toThrow(AppError);
     });
   });
-}); 
+});

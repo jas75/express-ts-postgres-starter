@@ -56,12 +56,20 @@ describe('Auth Controller', () => {
     } as unknown as Partial<Response>;
 
     // Mock ResponseHandler success to call res.json
-    (ResponseHandler.success as jest.Mock).mockImplementation(function(res: any, data: any, message: string) {
+    (ResponseHandler.success as jest.Mock).mockImplementation(function (
+      res: any,
+      data: any,
+      message: string,
+    ) {
       return res.json({ status: 'success', message, data });
     });
 
     // Mock ResponseHandler error to call res.status().json()
-    (ResponseHandler.error as jest.Mock).mockImplementation(function(res: any, message: string, statusCode: number) {
+    (ResponseHandler.error as jest.Mock).mockImplementation(function (
+      res: any,
+      message: string,
+      statusCode: number,
+    ) {
       return res.status(statusCode).json({ status: 'error', message });
     });
   });
@@ -132,7 +140,7 @@ describe('Auth Controller', () => {
       // Verify response (without password)
       const userWithoutPassword = { ...mockUser } as Partial<typeof mockUser>;
       delete userWithoutPassword.password;
-      
+
       expect(ResponseHandler.created).toHaveBeenCalledWith(
         res,
         { user: userWithoutPassword },
@@ -213,4 +221,4 @@ describe('Auth Controller', () => {
       expect(ResponseHandler.success).toHaveBeenCalledWith(res, null, 'Logout successful');
     });
   });
-}); 
+});

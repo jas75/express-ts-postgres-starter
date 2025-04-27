@@ -5,7 +5,7 @@ import {
   getUserByEmail,
   createUser,
   updateUser,
-  changeUserPassword
+  changeUserPassword,
 } from '../../../../../src/api/v1/services/userService';
 import { AppError } from '../../../../../src/core/middleware/errorHandler';
 import { User } from '../../../../../src/core/models/User';
@@ -28,7 +28,7 @@ const mockUser: User = {
   is_active: true,
   createdAt: new Date(),
   updatedAt: new Date(),
-  lastLogin: new Date()
+  lastLogin: new Date(),
 };
 
 // Define types for our mocks
@@ -45,14 +45,14 @@ type MockClient = {
 jest.mock('../../../../../src/core/database/postgresql', () => ({
   db: {
     query: jest.fn(),
-    transaction: jest.fn()
-  }
+    transaction: jest.fn(),
+  },
 }));
 
 // Mock the bcrypt module
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
-  compare: jest.fn()
+  compare: jest.fn(),
 }));
 
 // Mock the logger
@@ -61,8 +61,8 @@ jest.mock('../../../../../src/utils/logger', () => ({
     info: jest.fn(),
     error: jest.fn(),
     debug: jest.fn(),
-    warn: jest.fn()
-  }
+    warn: jest.fn(),
+  },
 }));
 
 // Import the mocked modules
@@ -72,7 +72,7 @@ import { compare } from 'bcrypt';
 describe('User Service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default mock implementations after clearing mocks
     (hash as jest.Mock).mockResolvedValue('hashed_password');
     (compare as jest.Mock).mockResolvedValue(true);
@@ -84,7 +84,7 @@ describe('User Service', () => {
       (db.query as jest.Mock).mockResolvedValue({ rows: [mockUser], rowCount: 1 });
 
       const result = await getUserById(MOCK_UUID);
-      
+
       expect(result).toEqual(mockUser);
       expect(db.query).toHaveBeenCalledWith('SELECT * FROM users WHERE id = $1', [MOCK_UUID]);
     });
@@ -93,7 +93,7 @@ describe('User Service', () => {
       (db.query as jest.Mock).mockResolvedValue({ rows: [], rowCount: 0 });
 
       const result = await getUserById(MOCK_UUID);
-      
+
       expect(result).toBeNull();
     });
 
@@ -110,16 +110,18 @@ describe('User Service', () => {
       (db.query as jest.Mock).mockResolvedValueOnce({ rows: [mockUser], rowCount: 1 });
 
       const result = await getUserByEmail('test@example.com');
-      
+
       expect(result).toEqual(mockUser);
-      expect(db.query).toHaveBeenCalledWith('SELECT * FROM users WHERE email = $1', ['test@example.com']);
+      expect(db.query).toHaveBeenCalledWith('SELECT * FROM users WHERE email = $1', [
+        'test@example.com',
+      ]);
     });
 
     it('should return null when user not found', async () => {
       (db.query as jest.Mock).mockResolvedValueOnce({ rows: [], rowCount: 0 });
 
       const result = await getUserByEmail('test@example.com');
-      
+
       expect(result).toBeNull();
     });
   });
@@ -129,35 +131,39 @@ describe('User Service', () => {
       email: 'test@example.com',
       password: 'password123',
       firstName: 'Test',
-      lastName: 'User'
+      lastName: 'User',
     };
 
     it('should create a user successfully', async () => {
-      const mockClient: MockClient = { 
-        query: jest.fn() 
+      const mockClient: MockClient = {
+        query: jest.fn(),
       };
       mockClient.query.mockResolvedValueOnce({ rows: [], rowCount: 0 }); // No existing user
       mockClient.query.mockResolvedValueOnce({ rows: [mockUser], rowCount: 1 }); // User created
-      
-      (db.transaction as jest.Mock).mockImplementationOnce((callback: (client: MockClient) => Promise<any>) => {
-        return Promise.resolve(callback(mockClient));
-      });
+
+      (db.transaction as jest.Mock).mockImplementationOnce(
+        (callback: (client: MockClient) => Promise<any>) => {
+          return Promise.resolve(callback(mockClient));
+        },
+      );
 
       const result = await createUser(userData);
-      
+
       expect(result).toEqual(mockUser);
       expect(hash).toHaveBeenCalledWith(userData.password, expect.any(Number));
     });
 
     it('should throw AppError when user already exists', async () => {
-      const mockClient: MockClient = { 
-        query: jest.fn() 
+      const mockClient: MockClient = {
+        query: jest.fn(),
       };
       mockClient.query.mockResolvedValueOnce({ rows: [{ id: MOCK_UUID }], rowCount: 1 }); // Existing user
-      
-      (db.transaction as jest.Mock).mockImplementationOnce((callback: (client: MockClient) => Promise<any>) => {
-        return Promise.resolve(callback(mockClient));
-      });
+
+      (db.transaction as jest.Mock).mockImplementationOnce(
+        (callback: (client: MockClient) => Promise<any>) => {
+          return Promise.resolve(callback(mockClient));
+        },
+      );
 
       await expect(createUser(userData)).rejects.toThrow('User with this email already exists');
     });
@@ -167,16 +173,16 @@ describe('User Service', () => {
     const userId = MOCK_UUID;
     const updateData = {
       firstName: 'Updated',
-      lastName: 'Name'
+      lastName: 'Name',
     };
 
     it('should update user successfully', async () => {
-      const updatedUser: User = { 
-        ...mockUser, 
-        firstName: 'Updated', 
-        lastName: 'Name' 
+      const updatedUser: User = {
+        ...mockUser,
+        firstName: 'Updated',
+        lastName: 'Name',
       };
-      
+
       // Mock for getUserById
       (db.query as jest.Mock).mockImplementation((query: string) => {
         if (query.includes('SELECT * FROM users WHERE id = $1')) {
@@ -187,7 +193,7 @@ describe('User Service', () => {
       });
 
       const result = await updateUser(userId, updateData);
-      
+
       expect(result).toHaveProperty('firstName', 'Updated');
       expect(result).toHaveProperty('lastName', 'Name');
     });
@@ -205,7 +211,7 @@ describe('User Service', () => {
     const passwordData = {
       currentPassword: 'oldPassword',
       newPassword: 'newPassword',
-      confirmPassword: 'newPassword'
+      confirmPassword: 'newPassword',
     };
 
     it('should change password successfully', async () => {
@@ -217,39 +223,39 @@ describe('User Service', () => {
         // For password update query
         return Promise.resolve({ rows: [], rowCount: 1 });
       });
-      
+
       // Ensure password validation passes
       (compare as jest.Mock).mockResolvedValue(true);
-      
+
       await changeUserPassword(userId, passwordData);
-      
+
       // Verify the hash was called with the new password
       expect(hash).toHaveBeenCalledWith(passwordData.newPassword, expect.any(Number));
-      
+
       // Verify db.query was called for the update
       expect(db.query).toHaveBeenCalledWith(
-        'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2', 
-        ['hashed_password', userId]
+        'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
+        ['hashed_password', userId],
       );
     });
 
     it('should throw AppError when current password is incorrect', async () => {
       // Setup mock for getUserById
       (db.query as jest.Mock).mockResolvedValue({ rows: [mockUser], rowCount: 1 });
-      
+
       // Mock password comparison to fail
       (compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(changeUserPassword(userId, passwordData))
-        .rejects.toThrow('Current password is incorrect');
+      await expect(changeUserPassword(userId, passwordData)).rejects.toThrow(
+        'Current password is incorrect',
+      );
     });
 
     it('should throw AppError when user not found', async () => {
       // User not found
       (db.query as jest.Mock).mockResolvedValue({ rows: [], rowCount: 0 });
 
-      await expect(changeUserPassword(userId, passwordData))
-        .rejects.toThrow('User not found');
+      await expect(changeUserPassword(userId, passwordData)).rejects.toThrow('User not found');
     });
   });
-}); 
+});

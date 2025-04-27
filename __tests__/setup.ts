@@ -15,7 +15,7 @@ import jwt from 'jsonwebtoken';
 // Create a mock authentication middleware for testing
 const mockAuthenticate = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader) {
     return res.status(401).json({
       success: false,
@@ -30,7 +30,7 @@ const mockAuthenticate = (req: Request, res: Response, next: NextFunction) => {
     email: 'test@example.com',
     role: 'admin',
   };
-  
+
   return next();
 };
 
@@ -73,7 +73,7 @@ export function createTestableApp() {
 
   // Create test-specific authentication endpoints for testing
   const testAuthRouter = express.Router();
-  
+
   // Test login endpoint that always succeeds
   testAuthRouter.post('/login', (req, res) => {
     const user = {
@@ -83,7 +83,7 @@ export function createTestableApp() {
       lastName: 'User',
       role: 'user',
     };
-    
+
     res.status(200).json({
       status: 'success',
       message: 'Login successful',
@@ -93,7 +93,7 @@ export function createTestableApp() {
       },
     });
   });
-  
+
   // Test register endpoint that always succeeds
   testAuthRouter.post('/register', (req, res) => {
     const user = {
@@ -103,7 +103,7 @@ export function createTestableApp() {
       lastName: req.body.lastName || 'User',
       role: 'user',
     };
-    
+
     res.status(201).json({
       status: 'success',
       message: 'User registered successfully',
@@ -113,7 +113,7 @@ export function createTestableApp() {
       },
     });
   });
-  
+
   // Test logout endpoint
   testAuthRouter.post('/logout', (req, res) => {
     res.status(200).json({
@@ -124,10 +124,10 @@ export function createTestableApp() {
 
   // Create mock users router
   const testUsersRouter = express.Router();
-  
+
   // Authenticate all users routes
   testUsersRouter.use(mockAuthenticate);
-  
+
   // Test user profile - Need to define this before the :id route to avoid conflict
   testUsersRouter.get('/profile', (req, res) => {
     res.status(200).json({
@@ -144,7 +144,7 @@ export function createTestableApp() {
       },
     });
   });
-  
+
   // Test get all users
   testUsersRouter.get('/', (req, res) => {
     res.status(200).json({
@@ -170,7 +170,7 @@ export function createTestableApp() {
       },
     });
   });
-  
+
   // Test get user by ID
   testUsersRouter.get('/:id', (req, res) => {
     if (req.params.id === 'non-existent-id') {
@@ -179,7 +179,7 @@ export function createTestableApp() {
         message: 'User not found',
       });
     }
-    
+
     res.status(200).json({
       status: 'success',
       message: 'User retrieved successfully',
@@ -197,10 +197,10 @@ export function createTestableApp() {
 
   // V1 API routes
   app.use(config.app.apiPrefix + '/v1', v1ApiRoutes);
-  
+
   // Use test auth routes for testing
   app.use('/api/auth', testAuthRouter);
-  
+
   // Use test users routes
   app.use('/api/v1/users', testUsersRouter);
 
@@ -237,4 +237,4 @@ export function createTestableApp() {
 
 // Create the testable app instance that will be used across tests
 const testApp = createTestableApp();
-export default testApp; 
+export default testApp;

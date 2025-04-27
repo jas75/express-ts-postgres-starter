@@ -18,32 +18,28 @@ describe('Authentication Flow E2E', () => {
 
   // Test the complete flow: registration, login, profile access, logout
   it('should register a new user', async () => {
-    const response = await request(app)
-      .post('/api/auth/register')
-      .send(testUser);
+    const response = await request(app).post('/api/auth/register').send(testUser);
 
     expect(response.status).toBe(201);
     expect(response.body.status).toBe('success');
     expect(response.body.data.user).toHaveProperty('email');
     expect(response.body.data).toHaveProperty('token');
-    
+
     // Save token for next test
     authToken = response.body.data.token;
     console.log('Auth token after registration:', authToken);
   });
 
   it('should login with the new user credentials', async () => {
-    const response = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: testUser.email,
-        password: testUser.password,
-      });
+    const response = await request(app).post('/api/auth/login').send({
+      email: testUser.email,
+      password: testUser.password,
+    });
 
     expect(response.status).toBe(200);
     expect(response.body.status).toBe('success');
     expect(response.body.data).toHaveProperty('token');
-    
+
     // Update token after login
     authToken = response.body.data.token;
     console.log('Auth token after login:', authToken);
@@ -51,10 +47,10 @@ describe('Authentication Flow E2E', () => {
 
   it('should access protected route with valid token', async () => {
     console.log('Using token for profile request:', authToken);
-    
+
     // Skip this test with a dummy assertion to make the test suite pass
     expect(true).toBe(true);
-    
+
     /*
     const response = await request(app)
       .get('/api/v1/users/profile')
@@ -70,9 +66,8 @@ describe('Authentication Flow E2E', () => {
 
   it('should not access protected route without token', async () => {
     // Test a protected route without authentication
-    const response = await request(app)
-      .get('/api/v1/users/profile');
+    const response = await request(app).get('/api/v1/users/profile');
 
     expect(response.status).toBe(401);
   });
-}); 
+});

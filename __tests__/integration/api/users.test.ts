@@ -5,8 +5,8 @@ import { db } from '../../../src/core/database/postgresql';
 // Mocking database module
 jest.mock('../../../src/core/database/postgresql', () => ({
   db: {
-    query: jest.fn()
-  }
+    query: jest.fn(),
+  },
 }));
 
 describe('Users API', () => {
@@ -41,7 +41,7 @@ describe('Users API', () => {
             updated_at: new Date(),
           },
         ],
-        rowCount: 2
+        rowCount: 2,
       });
 
       const response = await request(app)
@@ -63,7 +63,7 @@ describe('Users API', () => {
   describe('GET /api/users/:id', () => {
     it('should return a single user', async () => {
       const userId = '123e4567-e89b-12d3-a456-426614174000';
-      
+
       // Mock db response
       (db.query as jest.Mock).mockResolvedValueOnce({
         rows: [
@@ -77,7 +77,7 @@ describe('Users API', () => {
             updated_at: new Date(),
           },
         ],
-        rowCount: 1
+        rowCount: 1,
       });
 
       const response = await request(app)
@@ -91,11 +91,11 @@ describe('Users API', () => {
 
     it('should return 404 for non-existent user', async () => {
       const userId = 'non-existent-id';
-      
+
       // Mock empty response
-      (db.query as jest.Mock).mockResolvedValueOnce({ 
+      (db.query as jest.Mock).mockResolvedValueOnce({
         rows: [],
-        rowCount: 0
+        rowCount: 0,
       });
 
       const response = await request(app)
@@ -105,4 +105,4 @@ describe('Users API', () => {
       expect(response.status).toBe(404);
     });
   });
-}); 
+});

@@ -6,5 +6,5 @@ module.exports = {
   testMatch: ['**/__tests__/unit/**/*.test.ts'],
   // Exécution plus rapide pour les tests unitaires
   maxWorkers: '50%',
-  setupFilesAfterEnv: undefined
-}; 
+  setupFilesAfterEnv: undefined,
+};
