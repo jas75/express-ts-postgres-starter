@@ -1,15 +1,10 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
-  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-  transform: {
-    '^.+\\.ts$': 'ts-jest',
-  },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/**/__tests__/**'],
+  roots: ['<rootDir>'],
+  testMatch: ['**/__tests__/**/*.test.ts'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/config/**/*.ts', '!src/index.ts'],
+  coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {
       branches: 70,
@@ -18,4 +13,19 @@ module.exports = {
       statements: 70,
     },
   },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  setupFilesAfterEnv: ['<rootDir>/__tests__/setup.ts'],
+  transform: {
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        isolatedModules: true,
+      },
+    ],
+  },
+  maxWorkers: 1, // Run tests sequentially to avoid port conflicts
+  forceExit: true, // Force Jest to exit after all tests are complete
 };

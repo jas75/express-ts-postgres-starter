@@ -8,7 +8,6 @@ import {
 import { validate } from '../../../../core/middleware/validationMiddleware';
 import { LoginSchema, RegisterSchema } from '../../../../core/models/User';
 import { authenticate } from '../../../../core/middleware/authMiddleware';
-import { logger } from '../../../../utils/logger';
 
 const router = Router();
 

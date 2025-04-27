@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { LoginUser, RegisterUser } from '../../../../core/models/User';
-import { login, refreshToken } from '../../services/authService';
+import { login, refreshToken, revokeRefreshToken } from '../../services/authService';
 import { createUser } from '../../services/userService';
 import { ResponseHandler } from '../../../../utils/responseHandler';
 import { asyncHandler } from '../../../../core/middleware/asyncHandler';
@@ -83,8 +83,10 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 
     const newUser = await createUser(userData);
 
-    // Remove password from response
-    const { password, ...userResponse } = newUser;
+    // Remove password from response using type-safe omit
+    const userResponse = Object.fromEntries(
+      Object.entries(newUser).filter(([key]) => key !== 'password'),
+    );
 
     return ResponseHandler.created(res, { user: userResponse }, 'User registered successfully');
   } catch (error) {
@@ -140,13 +142,17 @@ export const refreshAuthToken = asyncHandler(async (req: Request, res: Response)
  *     security:
  *       - bearerAuth: []
  *     responses:
- *       204:
+ *       200:
  *         description: Logged out successfully
  *       401:
  *         description: Not authenticated
  */
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  // In a more complete implementation, you would invalidate the refresh token
-  // For now, we just return success
-  return ResponseHandler.noContent(res);
+  const refreshToken = req.cookies?.refreshToken;
+
+  if (refreshToken) {
+    await revokeRefreshToken(refreshToken);
+  }
+
+  return ResponseHandler.success(res, null, 'Logout successful');
 });
