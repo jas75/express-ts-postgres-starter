@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { getUserById, updateUser, changeUserPassword } from '../../services/userService';
+import { getUserById, updateUser, changeUserPassword } from './userService';
 import { ResponseHandler } from '../../../../utils/responseHandler';
 import { asyncHandler } from '../../../../core/middleware/asyncHandler';
 import { AuthenticatedRequest } from '../../../../core/types';

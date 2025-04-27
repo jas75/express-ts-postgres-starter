@@ -3,7 +3,7 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { compareSync } from 'bcrypt';
-import { getUserById, getUserByEmail } from '../api/v1/services/userService';
+import { getUserById, getUserByEmail } from '../api/v1/modules/user/userService';
 
 export const setupPassport = (app: Express): void => {
   app.use(passport.initialize());

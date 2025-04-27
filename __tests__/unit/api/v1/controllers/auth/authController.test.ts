@@ -5,7 +5,7 @@ import {
   registerUser as register,
   refreshAuthToken as refreshTokens,
   logout,
-} from '../../../../../../src/api/v1/controllers/auth/authController';
+} from '../../../../../../src/api/v1/modules/auth/authController';
 import { ResponseHandler } from '../../../../../../src/utils/responseHandler';
 
 // Mock services

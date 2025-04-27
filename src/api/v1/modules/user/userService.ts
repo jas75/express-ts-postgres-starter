@@ -1,9 +1,9 @@
 import { hash, compare } from 'bcrypt';
-import { db } from '../../../core/database/postgresql';
-import { User, RegisterUser, UpdateUser, ChangePassword } from '../../../core/models/User';
-import { AppError } from '../../../core/middleware/errorHandler';
-import { config } from '../../../config/app';
-import { logger } from '../../../utils/logger';
+import { db } from '../../../../core/database/postgresql';
+import { User, RegisterUser, UpdateUser, ChangePassword } from '../../../../core/models/User';
+import { AppError } from '../../../../core/middleware/errorHandler';
+import { config } from '../../../../config/app';
+import { logger } from '../../../../utils/logger';
 
 // Used to distinguish real DB vs test environment
 export const isTestEnvironment = () => process.env.NODE_ENV === 'test';

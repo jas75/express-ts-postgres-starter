@@ -3,7 +3,7 @@ import {
   getUserProfile,
   updateUserProfile,
   changePassword,
-} from '../../controllers/user/userController';
+} from '../../modules/user/userController';
 import { authenticate } from '../../../../core/middleware/authMiddleware';
 import { validate } from '../../../../core/middleware/validationMiddleware';
 import { UpdateUserSchema, ChangePasswordSchema } from '../../../../core/models/User';

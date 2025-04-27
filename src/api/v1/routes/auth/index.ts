@@ -4,7 +4,7 @@ import {
   registerUser,
   refreshAuthToken,
   logout,
-} from '../../controllers/auth/authController';
+} from '../../modules/auth/authController';
 import { validate } from '../../../../core/middleware/validationMiddleware';
 import { LoginSchema, RegisterSchema } from '../../../../core/models/User';
 import { authenticate } from '../../../../core/middleware/authMiddleware';
