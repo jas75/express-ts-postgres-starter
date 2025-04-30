@@ -33,8 +33,8 @@ import {
   login as loginService,
   refreshToken as refreshTokenService,
   revokeRefreshToken,
-} from '../../../../../../src/api/v1/services/authService';
-import { createUser } from '../../../../../../src/api/v1/services/userService';
+} from '../../../../../../src/api/v1/modules/auth/authService';
+import { createUser } from '../../../../../../src/api/v1/modules/user/userService';
 
 describe('Auth Controller', () => {
   let req: Partial<Request>;
