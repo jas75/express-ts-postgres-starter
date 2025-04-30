@@ -1,12 +1,12 @@
 import jwt, { Secret } from 'jsonwebtoken';
 import { compare } from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { LoginUser, SafeUser } from '../../../core/models/User';
-import { getUserByEmail } from './userService';
-import { AppError } from '../../../core/middleware/errorHandler';
-import { config } from '../../../config/app';
-import { db } from '../../../core/database/postgresql';
-import { logger } from '../../../utils/logger';
+import { LoginUser, SafeUser } from '../../../../core/models/User';
+import { getUserByEmail } from '../user/userService';
+import { AppError } from '../../../../core/middleware/errorHandler';
+import { config } from '../../../../config/app';
+import { db } from '../../../../core/database/postgresql';
+import { logger } from '../../../../utils/logger';
 
 interface TokenPayload {
   id: string;

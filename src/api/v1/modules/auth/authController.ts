@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { LoginUser, RegisterUser } from '../../../../core/models/User';
-import { login, refreshToken, revokeRefreshToken } from '../../services/authService';
-import { createUser } from '../../services/userService';
+import { login, refreshToken, revokeRefreshToken } from './authService';
+import { createUser } from '../user/userService';
 import { ResponseHandler } from '../../../../utils/responseHandler';
 import { asyncHandler } from '../../../../core/middleware/asyncHandler';
 import { HttpStatusCode } from '../../../../core/types';
