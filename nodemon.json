@@ -1,7 +1,7 @@
 {
-  "watch": ["dist"],
-  "ext": "js",
-  "ignore": ["dist/**/*.js.map"],
+  "watch": ["src"],
+  "ext": "ts,json",
+  "exec": "ts-node ./src/index.ts",
   "delay": "1000",
   "verbose": false
 } 

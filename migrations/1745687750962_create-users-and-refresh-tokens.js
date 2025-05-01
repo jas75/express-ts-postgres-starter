@@ -9,6 +9,9 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
+  // Create extension for UUID generation if doesn't exist
+  pgm.createExtension('uuid-ossp', { ifNotExists: true });
+
   // Create users table
   pgm.createTable('users', {
     id: { type: 'uuid', primaryKey: true, default: pgm.func('uuid_generate_v4()') },
@@ -43,9 +46,6 @@ exports.up = (pgm) => {
 
   // Create index on user_id for faster lookups
   pgm.createIndex('refresh_tokens', 'user_id');
-  
-  // Create extension for UUID generation if doesn't exist
-  pgm.createExtension('uuid-ossp', { ifNotExists: true });
 };
 
 /**

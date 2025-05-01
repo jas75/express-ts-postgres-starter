@@ -1,23 +1,34 @@
-FROM node:18-alpine as builder
+FROM node:20-alpine
 
 WORKDIR /app
 
+# Install build dependencies for bcrypt
+RUN apk add --no-cache python3 make g++
+
+# Install dependencies
 COPY package*.json ./
 RUN npm ci
 
+# Copy source code
 COPY . .
+
+# Build TypeScript
 RUN npm run build
 
-FROM node:18-alpine
-
+# Development mode
+FROM node:20-alpine AS development
 WORKDIR /app
+# Install build dependencies for bcrypt
+RUN apk add --no-cache python3 make g++
+COPY --from=0 /app .
+CMD ["npm", "run", "dev"]
 
-COPY package*.json ./
+# Production mode
+FROM node:20-alpine AS production
+WORKDIR /app
+# Install build dependencies for bcrypt
+RUN apk add --no-cache python3 make g++
+COPY --from=0 /app/package*.json ./
+COPY --from=0 /app/dist ./dist
 RUN npm ci --only=production
-
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/migrations ./migrations
-
-EXPOSE 3000
-
-CMD ["node", "dist/index.js"] 
+CMD ["node", "dist/index.js"]

@@ -37,7 +37,7 @@ import { logger } from '../../../../utils/logger';
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const credentials = req.body as LoginUser;
   const { user, token, refreshToken: refresh } = await login(credentials);
-
+  console.log('ussssssser', user);
   return ResponseHandler.success(res, { user, token, refreshToken: refresh }, 'Login successful');
 });
 

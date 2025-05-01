@@ -2,37 +2,83 @@ version: '3.8'
 
 services:
   app:
-    build: .
-    ports:
-      - "3000:3000"
-    depends_on:
-      - postgres
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - NODE_ENV=development
-      - PORT=3000
+      # Server
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=${PORT:-3000}
+      - API_PREFIX=/api
+      
+      # Database
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=api_db
-      - JWT_SECRET=your_jwt_secret
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-app}
+      - DB_POOL_MIN=2
+      - DB_POOL_MAX=10
+      
+      # Security
+      - JWT_SECRET=${JWT_SECRET:-your-secure-jwt-secret-key}
+      - JWT_EXPIRES_IN=1d
+      - SALT_ROUNDS=10
+      
+      # Rate Limiting
       - RATE_LIMIT_WINDOW_MS=900000
       - RATE_LIMIT_MAX=100
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
     volumes:
       - ./src:/app/src
-      - ./dist:/app/dist
-    command: npm run dev
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - app-network
+
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npm run migrate:up
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-app}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
 
   postgres:
-    image: postgres:14-alpine
-    ports:
-      - "5432:5432"
+    image: postgres:16
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=api_db
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_NAME:-app}
+    ports:
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   postgres_data: 

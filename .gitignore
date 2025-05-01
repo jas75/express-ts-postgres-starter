@@ -13,7 +13,7 @@ build/
 .env.local
 .env.development
 .env.test
-.env.production
+.env.prod
 
 # Logs
 logs
