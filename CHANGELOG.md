@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added node-pg-migrate to main dependencies for database migration management
+- Enhanced API routes with versioning in Swagger documentation
+
+### Changed
+- Updated Docker configurations
+  - Enhanced Dockerfile for multi-stage builds
+  - Adjusted .dockerignore for better environment management
+  - Removed deprecated Docker files
+- Improved project structure
+  - Moved authentication and user management to 'modules' directory
+  - Updated import paths for better organization
+  - Enhanced asyncHandler with AuthenticatedRequest type support
+- Optimized environment configuration
+  - Renamed production environment variables for consistency
+  - Adjusted nodemon settings for TypeScript development
+- Streamlined dependencies management
+  - Moved node-pg-migrate from devDependencies to dependencies
+
+### Removed
+- Deprecated Docker configuration files
+
 ## [0.1.0] - 2024-03-21
 
 ### Added
