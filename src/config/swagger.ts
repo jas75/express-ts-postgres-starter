@@ -31,7 +31,7 @@ const options: swaggerJsdoc.Options = {
       },
     ],
   },
-  apis: ['./src/api/v1/routes/**/*.ts', './src/api/v1/routes/*.ts', './src/api/v1/models/*.ts'],
+  apis: process.env.NODE_ENV === 'production' ? ['./dist/**/*.js'] : ['./src/**/*.ts'],
 };
 
 export const setupSwagger = (app: Express): void => {

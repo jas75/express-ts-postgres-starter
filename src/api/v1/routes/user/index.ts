@@ -46,7 +46,7 @@ router.get('/profile', authenticate, getUserProfile);
 
 /**
  * @swagger
- * /api/users/profile:
+ * /api/v1/users/profile:
  *   put:
  *     summary: Update user profile
  *     description: Update the authenticated user's profile information
@@ -77,7 +77,7 @@ router.put('/profile', authenticate, validate(UpdateUserSchema), updateUserProfi
 
 /**
  * @swagger
- * /api/users/change-password:
+ * /api/v1/users/change-password:
  *   post:
  *     summary: Change user password
  *     description: Change the authenticated user's password

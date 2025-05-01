@@ -20,8 +20,8 @@
     "migrate:up": "npx node-pg-migrate --config migrate-config.js up",
     "migrate:down": "npx node-pg-migrate --config migrate-config.js down",
     "docs": "npx tsoa spec-and-routes",
-    "docker:dev": "docker compose up",
-    "docker:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
+    "docker": "docker compose up",
+    "docker:build": "docker compose up --build",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f"
   },
