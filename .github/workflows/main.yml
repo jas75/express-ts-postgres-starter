@@ -38,25 +38,29 @@ jobs:
         run: npm ci
 
       - name: Verify PostgreSQL Connection
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           sudo apt-get install -y postgresql-client
-          PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\l'
-          PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\dt'
+          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c '\l'
+          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c '\dt'
 
       - name: Run Database Migrations
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_db
+          DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
           NODE_ENV: test
         run: npm run migrate:up
 
       - name: Verify Tables After Migration
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\dt'
+          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c '\dt'
 
       - name: Run tests
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_db
+          DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
           NODE_ENV: test
-          JWT_SECRET: myjwtsecret
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm test
    
