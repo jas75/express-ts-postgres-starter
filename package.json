@@ -23,7 +23,8 @@
     "docker": "docker compose up",
     "docker:build": "docker compose up --build",
     "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f"
+    "docker:logs": "docker compose logs -f",
+    "pipeline": "npm run lint && npm run migrate:up && npm test"
   },
   "keywords": [
     "express",
