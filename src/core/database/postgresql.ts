@@ -8,16 +8,27 @@ class PostgresqlClient {
   private static instance: PostgresqlClient;
 
   private constructor() {
-    const poolConfig: PoolConfig = {
-      host: config.database.host,
-      port: config.database.port,
-      user: config.database.user,
-      password: config.database.password,
-      database: config.database.name,
-      max: config.database.poolMax,
-      connectionTimeoutMillis: 10000,
-      idleTimeoutMillis: 30000,
-    };
+    let poolConfig: PoolConfig;
+
+    if (process.env.DATABASE_URL) {
+      poolConfig = {
+        connectionString: process.env.DATABASE_URL,
+        max: config.database.poolMax,
+        connectionTimeoutMillis: 10000,
+        idleTimeoutMillis: 30000,
+      };
+    } else {
+      poolConfig = {
+        host: config.database.host,
+        port: config.database.port,
+        user: config.database.user,
+        password: config.database.password,
+        database: config.database.name,
+        max: config.database.poolMax,
+        connectionTimeoutMillis: 10000,
+        idleTimeoutMillis: 30000,
+      };
+    }
 
     this.pool = new Pool(poolConfig);
 
