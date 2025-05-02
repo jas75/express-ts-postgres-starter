@@ -6,7 +6,7 @@ import { config } from '../../../../config/app';
 import { logger } from '../../../../utils/logger';
 
 // Used to distinguish real DB vs test environment
-export const isTestEnvironment = () => process.env.NODE_ENV === 'test';
+export const isTestEnvironment = (): boolean => process.env.NODE_ENV === 'test';
 
 /**
  * Get user by ID

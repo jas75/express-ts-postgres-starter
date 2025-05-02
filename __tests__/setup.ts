@@ -6,21 +6,19 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { errorHandler } from '../src/core/middleware/errorHandler';
 import v1ApiRoutes from '../src/api/v1/routes';
-import authRoutes from '../src/api/v1/routes/auth';
 import { setupSwagger } from '../src/config/swagger';
 import { setupPassport } from '../src/config/passport';
 import { config } from '../src/config/app';
-import jwt from 'jsonwebtoken';
 
 // Create a mock authentication middleware for testing
-const mockAuthenticate = (req: Request, res: Response, next: NextFunction) => {
+const mockAuthenticate = (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
-
   if (!authHeader) {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       message: 'Unauthorized - No token provided',
     });
+    return;
   }
 
   // In tests, we'll just check for the presence of a token,
@@ -35,7 +33,7 @@ const mockAuthenticate = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Create a testable app that doesn't auto-start the server
-export function createTestableApp() {
+export function createTestableApp(): express.Application {
   const app = express();
 
   // Apply security middleware

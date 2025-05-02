@@ -7,7 +7,7 @@ import {
   login,
   refreshToken,
   revokeRefreshToken,
-} from '../../../../../src/api/v1/services/authService';
+} from '../../../../../src/api/v1/modules/auth/authService';
 import { AppError } from '../../../../../src/core/middleware/errorHandler';
 
 // Valid UUID for testing
@@ -54,8 +54,7 @@ jest.mock('../../../../../src/api/v1/services/userService', () => ({
 
 // Import mocked modules
 import { db } from '../../../../../src/core/database/postgresql';
-import { getUserByEmail } from '../../../../../src/api/v1/services/userService';
-import { v4 as uuidv4 } from 'uuid';
+import { getUserByEmail } from '../../../../../src/api/v1/modules/user/userService';
 
 describe('Auth Service', () => {
   beforeEach(() => {

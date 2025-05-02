@@ -19,7 +19,12 @@ export class AppError extends Error {
 /**
  * Global error handler middleware
  */
-export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction) => {
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  _next: NextFunction,
+): void => {
   // Log error details
   const logData = {
     url: req.originalUrl,

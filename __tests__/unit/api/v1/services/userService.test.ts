@@ -6,10 +6,9 @@ import {
   createUser,
   updateUser,
   changeUserPassword,
-} from '../../../../../src/api/v1/services/userService';
+} from '../../../../../src/api/v1/modules/user/userService';
 import { AppError } from '../../../../../src/core/middleware/errorHandler';
 import { User } from '../../../../../src/core/models/User';
-import { QueryResult } from '../../../../../src/core/types';
 
 // Valid UUID for testing
 const MOCK_UUID = 'f0ad1a67-5705-4e48-bcd2-836a5ce6f2fa';

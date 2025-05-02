@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import jwt, { Secret } from 'jsonwebtoken';
 import { compare } from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';

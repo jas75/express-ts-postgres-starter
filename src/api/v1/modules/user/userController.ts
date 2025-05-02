@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Response } from 'express';
 import { getUserById, updateUser, changeUserPassword } from './userService';
 import { ResponseHandler } from '../../../../utils/responseHandler';

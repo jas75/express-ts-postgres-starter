@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import request from 'supertest';
 import app from '../setup';
 
@@ -27,7 +28,6 @@ describe('Authentication Flow E2E', () => {
 
     // Save token for next test
     authToken = response.body.data.token;
-    console.log('Auth token after registration:', authToken);
   });
 
   it('should login with the new user credentials', async () => {
@@ -42,13 +42,11 @@ describe('Authentication Flow E2E', () => {
 
     // Update token after login
     authToken = response.body.data.token;
-    console.log('Auth token after login:', authToken);
   });
 
   it('should access protected route with valid token', async () => {
-    console.log('Using token for profile request:', authToken);
-
     // Skip this test with a dummy assertion to make the test suite pass
+
     expect(true).toBe(true);
 
     /*

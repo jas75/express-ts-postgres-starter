@@ -1,4 +1,4 @@
-import { Pool, PoolConfig, QueryResult as PgQueryResult } from 'pg';
+import { Pool, PoolConfig, QueryResult as PgQueryResult, PoolClient } from 'pg';
 import { logger } from '../../utils/logger';
 import { config } from '../../config/app';
 import { QueryResult } from '../types';
@@ -70,11 +70,11 @@ class PostgresqlClient {
     }
   }
 
-  public async getClient() {
+  public async getClient(): Promise<PoolClient> {
     return this.pool.connect();
   }
 
-  public async transaction<T>(callback: (client: any) => Promise<T>): Promise<T> {
+  public async transaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
     const client = await this.pool.connect();
 
     try {
