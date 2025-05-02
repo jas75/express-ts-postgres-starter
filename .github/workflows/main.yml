@@ -27,17 +27,17 @@ jobs:
 
 
       - name: Extract secrets
-            env:
-              POSTGRES_USER: ${{ secrets.DB_USER }}
-              POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-              POSTGRES_DB: ${{ secrets.DB_NAME }}
-              POSTGRES_HOST_AUTH_METHOD: trust
-            run: |
-              echo "POSTGRES_USER=$POSTGRES_USER" | base64 > secrets.txt
-              echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" | base64 >> secrets.txt
-              echo "POSTGRES_DB=$POSTGRES_DB" | base64 >> secrets.txt
-              echo "POSTGRES_HOST_AUTH_METHOD=$POSTGRES_HOST_AUTH_METHOD" | base64 >> secrets.txt
-              cat secrets.txt
+        env:
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_HOST_AUTH_METHOD: trust
+        run: |
+          echo "POSTGRES_USER=$POSTGRES_USER" | base64 > secrets.txt
+          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" | base64 >> secrets.txt
+          echo "POSTGRES_DB=$POSTGRES_DB" | base64 >> secrets.txt
+          echo "POSTGRES_HOST_AUTH_METHOD=$POSTGRES_HOST_AUTH_METHOD" | base64 >> secrets.txt
+          cat secrets.txt
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
