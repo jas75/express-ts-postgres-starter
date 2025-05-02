@@ -33,10 +33,10 @@ jobs:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
           POSTGRES_HOST_AUTH_METHOD: trust
         run: |
-          echo "POSTGRES_USER=$POSTGRES_USER" | base64 > secrets.txt
-          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" | base64 >> secrets.txt
-          echo "POSTGRES_DB=$POSTGRES_DB" | base64 >> secrets.txt
-          echo "POSTGRES_HOST_AUTH_METHOD=$POSTGRES_HOST_AUTH_METHOD" | base64 >> secrets.txt
+          echo "POSTGRES_USER=$POSTGRES_USER" >> secrets.txt
+          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> secrets.txt
+          echo "POSTGRES_DB=$POSTGRES_DB" >> secrets.txt
+          echo "POSTGRES_HOST_AUTH_METHOD=$POSTGRES_HOST_AUTH_METHOD" >> secrets.txt
           cat secrets.txt
 
       - name: Setup Node.js
