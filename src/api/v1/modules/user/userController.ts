@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { getUserById, updateUser, changeUserPassword } from './userService';
 import { ResponseHandler } from '../../../../utils/responseHandler';
 import { asyncHandler } from '../../../../core/middleware/asyncHandler';
-import { AuthenticatedRequest } from '../../../../core/types';
+import { AuthenticatedRequest } from '../../../../core/types/express';
 import { UpdateUser, ChangePassword } from '../../../../core/models/User';
 
 /**
@@ -20,23 +20,25 @@ import { UpdateUser, ChangePassword } from '../../../../core/models/User';
  *       401:
  *         description: Unauthorized
  */
-export const getUserProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.user.id;
-  const user = await getUserById(userId);
+export const getUserProfile = asyncHandler<AuthenticatedRequest>(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.id;
+    const user = await getUserById(userId);
 
-  if (!user) {
-    return ResponseHandler.notFound(res, 'User not found');
-  }
+    if (!user) {
+      return ResponseHandler.notFound(res, 'User not found');
+    }
 
-  // Remove sensitive information
-  const { password, ...userResponse } = user;
+    // Remove sensitive information
+    const { password, ...userResponse } = user;
 
-  return ResponseHandler.success(
-    res,
-    { user: userResponse },
-    'User profile retrieved successfully',
-  );
-});
+    return ResponseHandler.success(
+      res,
+      { user: userResponse },
+      'User profile retrieved successfully',
+    );
+  },
+);
 
 /**
  * @swagger
@@ -68,17 +70,23 @@ export const getUserProfile = asyncHandler(async (req: AuthenticatedRequest, res
  *       400:
  *         description: Invalid input data
  */
-export const updateUserProfile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.user.id;
-  const userData = req.body as UpdateUser;
+export const updateUserProfile = asyncHandler<AuthenticatedRequest>(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.id;
+    const userData = req.body as UpdateUser;
 
-  const updatedUser = await updateUser(userId, userData);
+    const updatedUser = await updateUser(userId, userData);
 
-  // Remove sensitive information
-  const { password, ...userResponse } = updatedUser;
+    // Remove sensitive information
+    const { password, ...userResponse } = updatedUser;
 
-  return ResponseHandler.success(res, { user: userResponse }, 'User profile updated successfully');
-});
+    return ResponseHandler.success(
+      res,
+      { user: userResponse },
+      'User profile updated successfully',
+    );
+  },
+);
 
 /**
  * @swagger
@@ -111,11 +119,13 @@ export const updateUserProfile = asyncHandler(async (req: AuthenticatedRequest, 
  *       400:
  *         description: Invalid input data
  */
-export const changePassword = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.user.id;
-  const passwordData = req.body as ChangePassword;
+export const changePassword = asyncHandler<AuthenticatedRequest>(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user.id;
+    const passwordData = req.body as ChangePassword;
 
-  await changeUserPassword(userId, passwordData);
+    await changeUserPassword(userId, passwordData);
 
-  return ResponseHandler.success(res, null, 'Password changed successfully');
-});
+    return ResponseHandler.success(res, null, 'Password changed successfully');
+  },
+);
