@@ -1,90 +1,85 @@
- name: CI
- 
- on:
-   push:
-     branches: [ main, master, feature/github-actions-setup ]
-   pull_request:
-     branches: [ main, master, feature/github-actions-setup ]
- 
- jobs:
-   build:
-     runs-on: ubuntu-latest
- 
-     services:
-       postgres:
-         image: postgres:latest
-         env:
-           POSTGRES_USER: postgres
-           POSTGRES_PASSWORD: postgres
-           POSTGRES_DB: ${{ secrets.DB_NAME }}
-           POSTGRES_HOST_AUTH_METHOD: trust
-         ports:
-           - 5432:5432
-           options: >-
-             --health-cmd pg_isready
-             --health-interval 10s
-             --health-timeout 5s
-             --health-retries 5
-             --name postgres-container
- 
-     steps:
-     - uses: actions/checkout@v3
- 
-     - name: Setup Node.js
-       uses: actions/setup-node@v3
-       with:
-         node-version: '18.x'
-         cache: 'npm'
- 
-     - name: Install dependencies
-       run: npm ci
+name: CI
 
-     - name: Setup Database User
-       run: |
-         echo "Creating database user..."
-         PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
-         echo "Granting privileges..."
-         PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
-         PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${{ secrets.DB_USER }};"
-         echo "Database user setup completed"
+on:
+  push:
+    branches: [ main, master, feature/github-actions-setup ]
+  pull_request:
+    branches: [ main, master, feature/github-actions-setup ]
 
-     - name: Debug PostgreSQL
-       run: |
-         echo "Waiting for PostgreSQL to be ready..."
-         timeout 20s bash -c 'until pg_isready -h localhost -p 5432; do sleep 1; done'
-         echo "PostgreSQL is ready"
-         echo "Testing connection..."
-         PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c "\l"
-         echo "Connection test completed"
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-     - name: Run linter
-       run: npm run lint
- 
-     - name: Build TypeScript
-       run: npm run build
- 
-     - name: Run migrations
-       run: npm run migrate:up
-       env:
-         DB_HOST: localhost
-         DB_PORT: 5432
-         DB_USER: ${{ secrets.DB_USER }}
-         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-         DB_NAME: ${{ secrets.DB_NAME }}
-         DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
- 
-     - name: Run tests
-       run: npm test
-       env:
-         DB_HOST: localhost
-         DB_PORT: 5432
-         DB_USER: ${{ secrets.DB_USER }}
-         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-         DB_NAME: ${{ secrets.DB_NAME }}
-         DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --name postgres-container
 
-     - name: PostgreSQL Logs
-       if: failure()
-       run: |
-         echo "PostgreSQL Logs:"
-         docker logs postgres-container
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Database User
+        run: |
+          echo "Creating database user..."
+          PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+          echo "Granting privileges..."
+          PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
+          PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${{ secrets.DB_USER }};"
+          echo "Database user setup completed"
+
+      - name: Debug PostgreSQL
+        run: |
+          echo "Waiting for PostgreSQL to be ready..."
+          timeout 20s bash -c 'until pg_isready -h localhost -p 5432; do sleep 1; done'
+          echo "PostgreSQL is ready"
+          echo "Testing connection..."
+          PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c "\l"
+          echo "Connection test completed"
+
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run migrations
+        run: npm run migrate:up
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
+
+      - name: Run tests
+        run: npm test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
+
+      - name: PostgreSQL Logs
+        if: failure()
+        run: |
+          echo "PostgreSQL Logs:"
+          docker logs postgres-container
