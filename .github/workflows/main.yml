@@ -51,7 +51,7 @@ jobs:
 
       - name: Verify Tables After Migration
         run: |
-          PGPASSWORD=$ psql -h localhost -U postgres -d api_db -c '\dt'
+          PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c '\dt'
 
       - name: Run tests
         env:
