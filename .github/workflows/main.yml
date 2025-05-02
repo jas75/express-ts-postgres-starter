@@ -43,10 +43,20 @@ jobs:
           PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\l'
           PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\dt'
 
-      # - name: Run tests
-      #   env:
-      #     DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_db
-      #     NODE_ENV: test
-      #     JWT_SECRET: myjwtsecret
-      #   run: npm test
+      - name: Run Database Migrations
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_db
+          NODE_ENV: test
+        run: npm run migrate
+
+      - name: Verify Tables After Migration
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\dt'
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_db
+          NODE_ENV: test
+          JWT_SECRET: myjwtsecret
+        run: npm test
    
