@@ -24,7 +24,7 @@ export const errorHandler = (
   req: Request,
   res: Response,
   _next: NextFunction,
-): void => {
+): Response => {
   // Log error details
   const logData = {
     url: req.originalUrl,
