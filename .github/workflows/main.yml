@@ -76,6 +76,7 @@ jobs:
 
       - name: Run migrations
         run: npm run migrate:up
+        secrets: inherit 
         env:
           DB_HOST: localhost
           DB_PORT: 5432
