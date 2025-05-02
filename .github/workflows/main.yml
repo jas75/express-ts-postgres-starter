@@ -43,6 +43,16 @@ jobs:
     - name: Build TypeScript
       run: npm run build
 
+    - name: Run migrations
+      run: npm run migrate:up
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        DB_NAME: test_db
+
     - name: Run tests
       run: npm test
       env:
