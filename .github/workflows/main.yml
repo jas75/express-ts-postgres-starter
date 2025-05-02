@@ -13,6 +13,17 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
