@@ -37,21 +37,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify PostgreSQL Connection
-        run: |
-          sudo apt-get install -y postgresql-client
-          PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c '\l'
-          PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c '\dt'
-
       - name: Run Database Migrations
         env:
           DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
           NODE_ENV: test
         run: npm run migrate:up
-
-      - name: Verify Tables After Migration
-        run: |
-          PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c '\dt'
 
       - name: Run tests
         env:
