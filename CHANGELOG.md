@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2024-03-22
+
 ### Added
 - Added node-pg-migrate to main dependencies for database migration management
 - Enhanced API routes with versioning in Swagger documentation
