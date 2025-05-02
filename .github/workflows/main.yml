@@ -52,7 +52,7 @@ jobs:
       run: |
         PGPASSWORD=postgres psql -h localhost -U postgres -c "DO \$\$ BEGIN CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}'; EXCEPTION WHEN duplicate_object THEN RAISE NOTICE 'User already exists'; END \$\$;"
         PGPASSWORD=postgres psql -h localhost -U postgres -c "ALTER USER ${{ secrets.DB_USER }} WITH SUPERUSER;"
-        PGPASSWORD=postgres psql -h localhost -U postgres -c "SELECT 'CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${{ secrets.DB_NAME }}')\gexec"
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${{ secrets.DB_NAME }}') THEN EXECUTE 'CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }}'; END IF; END \$\$;"
       env:
         PGHOST: localhost
         PGPORT: 5432
