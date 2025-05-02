@@ -45,7 +45,7 @@ jobs:
 
       - name: Run Database Migrations
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_db
+          DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
           NODE_ENV: test
         run: npm run migrate:up
 
