@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, feature/github-actions-setup ]
+  pull_request:
+    branches: [ main, master, feature/github-actions-setup ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --name postgres-container
+
+    steps:
+      - uses: actions/checkout@v3
+
+
+      - name: Extract secrets
+        env:
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_HOST_AUTH_METHOD: trust
+        run: |
+          echo "POSTGRES_USER=$POSTGRES_USER" | base64 >> secrets.txt
+          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" | base64 >> secrets.txt
+          echo "POSTGRES_DB=$POSTGRES_DB" | base64 >> secrets.txt
+          echo "POSTGRES_HOST_AUTH_METHOD=$POSTGRES_HOST_AUTH_METHOD" | base64 >> secrets.txt
+          cat secrets.txt
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Database
+        run: |
+          # Create database
+          echo "Creating database..."
+          export PGPASSWORD=postgres
+          psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};" || echo "Database already exists"
+          
+          # Create user
+          echo "Creating database user if not exists..."
+          psql -h localhost -U postgres -c "DO \$\$ BEGIN CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}'; EXCEPTION WHEN duplicate_object THEN RAISE NOTICE 'User already exists'; END \$\$;"
+          
+          # Grant privileges
+          echo "Granting privileges..."
+          psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
+          psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${{ secrets.DB_USER }};"
+          psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO ${{ secrets.DB_USER }};"
+          echo "Database setup completed"
+
+      - name: Verify Database Setup
+        run: |
+          echo "Verifying database connection..."
+          export PGPASSWORD=${{ secrets.DB_PASSWORD }}
+          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c "\conninfo"
+          echo "Verification completed"
+
+      - name: Debug PostgreSQL
+        run: |
+          echo "Waiting for PostgreSQL to be ready..."
+          timeout 20s bash -c 'until pg_isready -h localhost -p 5432; do sleep 1; done'
+          echo "PostgreSQL is ready"
+          echo "Testing connection..."
+          PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c "\l"
+          echo "Connection test completed"
+
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run migrations
+        run: npm run migrate:up
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
+
+      - name: Run tests
+        run: npm test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
+
+      - name: PostgreSQL Logs
+        if: failure()
+        run: |
+          echo "PostgreSQL Logs:"
+          docker logs postgres-container
