@@ -37,9 +37,9 @@ jobs:
       - name: Setup Database
         run: |
           echo "Creating database..."
-          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
-          echo "Creating database user..."
-          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};" || echo "Database already exists"
+          echo "Creating database user if not exists..."
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "DO \$\$ BEGIN CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}'; EXCEPTION WHEN duplicate_object THEN RAISE NOTICE 'User already exists'; END \$\$;"
           echo "Granting privileges..."
           PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
           PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${{ secrets.DB_USER }};"
