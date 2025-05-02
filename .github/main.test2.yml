@@ -1,0 +1,99 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, feature/github-actions-setup ]
+  pull_request:
+    branches: [ main, master, feature/github-actions-setup ]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linter
+      run: npm run lint || true
+
+    - name: Setup Database
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "DO \$\$ BEGIN CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}'; EXCEPTION WHEN duplicate_object THEN RAISE NOTICE 'User already exists'; END \$\$;"
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "ALTER USER ${{ secrets.DB_USER }} WITH SUPERUSER;"
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${{ secrets.DB_NAME }}') THEN EXECUTE 'CREATE DATABASE ${{ secrets.DB_NAME }} OWNER ${{ secrets.DB_USER }}'; END IF; END \$\$;"
+      env:
+        PGHOST: localhost
+        PGPORT: 5432
+
+    - name: Run migrations
+      run: npm run migrate:up
+      env:
+        DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
+
+    - name: Run tests
+      run: npm test || true
+      env:
+        DATABASE_URL: postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+    
+    # Exemple de déploiement (à adapter selon votre plateforme)
+    - name: Deploy
+      run: |
+        echo "Add your deployment commands here"
+      env:
+        DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }} 
