@@ -6,17 +6,12 @@ import { AuthenticatedRequest } from '../types';
 
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
   passport.authenticate('jwt', { session: false }, (err: Error, user: User) => {
-    if (err) {
-      return next(new AppError(`Authentication error: ${err.message}`, 500));
-    }
-
-    if (!user) {
+    if (err || !user) {
       return next(new AppError('Unauthorized - Invalid token', 401));
     }
 
-    // Attach the full user object to the request
-    (req as AuthenticatedRequest).user = user;
-    return next();
+    // Pass the user directly to next middleware
+    return next(user);
   })(req, res, next);
 };
 

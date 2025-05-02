@@ -7,15 +7,22 @@ import {
   logout,
 } from '../../../../../../src/api/v1/modules/auth/authController';
 import { ResponseHandler } from '../../../../../../src/utils/responseHandler';
+import {
+  login as loginService,
+  refreshToken as refreshTokenService,
+  revokeRefreshToken,
+} from '../../../../../../src/api/v1/modules/auth/authService';
+import { createUser } from '../../../../../../src/api/v1/modules/user/userService';
 
-// Mock services
-jest.mock('../../../../../../src/api/v1/services/authService', () => ({
+// Mock auth service
+jest.mock('../../../../../../src/api/v1/modules/auth/authService', () => ({
   login: jest.fn(),
   refreshToken: jest.fn(),
   revokeRefreshToken: jest.fn(),
 }));
 
-jest.mock('../../../../../../src/api/v1/services/userService', () => ({
+// Mock user service
+jest.mock('../../../../../../src/api/v1/modules/user/userService', () => ({
   createUser: jest.fn(),
 }));
 
@@ -27,14 +34,6 @@ jest.mock('../../../../../../src/utils/responseHandler', () => ({
     created: jest.fn(),
   },
 }));
-
-// Import mocked modules
-import {
-  login as loginService,
-  refreshToken as refreshTokenService,
-  revokeRefreshToken,
-} from '../../../../../../src/api/v1/modules/auth/authService';
-import { createUser } from '../../../../../../src/api/v1/modules/user/userService';
 
 describe('Auth Controller', () => {
   let req: Partial<Request>;

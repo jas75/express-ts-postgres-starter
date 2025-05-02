@@ -4,12 +4,12 @@ import {
   getUserProfile,
   updateUserProfile,
   changePassword,
-} from '../../../../../../src/api/v1/controllers/user/userController';
+} from '../../../../../../src/api/v1/modules/user/userController';
 import { AuthenticatedRequest } from '../../../../../../src/core/types';
 import { ResponseHandler } from '../../../../../../src/utils/responseHandler';
 
 // Mock the user service
-jest.mock('../../../../../../src/api/v1/services/userService', () => ({
+jest.mock('../../../../../../src/api/v1/modules/user/userService', () => ({
   getUserById: jest.fn(),
   updateUser: jest.fn(),
   changeUserPassword: jest.fn(),
@@ -28,7 +28,7 @@ import {
   getUserById,
   updateUser,
   changeUserPassword,
-} from '../../../../../../src/api/v1/services/userService';
+} from '../../../../../../src/api/v1/modules/user/userService';
 
 // Valid UUID for testing
 const MOCK_UUID = 'f0ad1a67-5705-4e48-bcd2-836a5ce6f2fa';

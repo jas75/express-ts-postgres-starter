@@ -48,7 +48,7 @@ jest.mock('../../../../../src/utils/logger', () => ({
 }));
 
 // Mock user service
-jest.mock('../../../../../src/api/v1/services/userService', () => ({
+jest.mock('../../../../../src/api/v1/modules/user/userService', () => ({
   getUserByEmail: jest.fn(),
 }));
 
