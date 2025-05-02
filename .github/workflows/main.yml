@@ -7,7 +7,7 @@ on:
     branches: [ main, feature/github-actions-setup ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     services:
@@ -31,11 +31,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Run linter
+        run: npm run lint || true
 
       - name: Run Database Migrations
         env:
@@ -49,4 +52,12 @@ jobs:
           NODE_ENV: test
           JWT_SECRET: myjwtsecret
         run: npm test
+
+  # deploy:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+  #   steps:
+  #     - uses: actions/checkout@v3
    
