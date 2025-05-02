@@ -16,7 +16,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
+          POSTGRES_DB: api_db
         ports:
           - 5432:5432
         options: >-
@@ -40,8 +40,13 @@ jobs:
       - name: Verify PostgreSQL Connection
         run: |
           sudo apt-get install -y postgresql-client
-          PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -c '\l'
-          PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -c '\dt'
+          PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\l'
+          PGPASSWORD=postgres psql -h localhost -U postgres -d api_db -c '\dt'
 
-     
+      # - name: Run tests
+      #   env:
+      #     DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_db
+      #     NODE_ENV: test
+      #     JWT_SECRET: myjwtsecret
+      #   run: npm test
    
