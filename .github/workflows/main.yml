@@ -36,15 +36,28 @@ jobs:
 
       - name: Setup Database
         run: |
+          # Create database
           echo "Creating database..."
-          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};" || echo "Database already exists"
+          export PGPASSWORD=postgres
+          psql -h localhost -U postgres -c "CREATE DATABASE ${{ secrets.DB_NAME }};" || echo "Database already exists"
+          
+          # Create user
           echo "Creating database user if not exists..."
-          PGPASSWORD=postgres psql -h localhost -U postgres -c "DO \$\$ BEGIN CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}'; EXCEPTION WHEN duplicate_object THEN RAISE NOTICE 'User already exists'; END \$\$;"
+          psql -h localhost -U postgres -c "DO \$\$ BEGIN CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}'; EXCEPTION WHEN duplicate_object THEN RAISE NOTICE 'User already exists'; END \$\$;"
+          
+          # Grant privileges
           echo "Granting privileges..."
-          PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
-          PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${{ secrets.DB_USER }};"
-          PGPASSWORD=postgres psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO ${{ secrets.DB_USER }};"
+          psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
+          psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${{ secrets.DB_USER }};"
+          psql -h localhost -U postgres -d ${{ secrets.DB_NAME }} -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO ${{ secrets.DB_USER }};"
           echo "Database setup completed"
+
+      - name: Verify Database Setup
+        run: |
+          echo "Verifying database connection..."
+          export PGPASSWORD=${{ secrets.DB_PASSWORD }}
+          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -c "\conninfo"
+          echo "Verification completed"
 
       - name: Debug PostgreSQL
         run: |
